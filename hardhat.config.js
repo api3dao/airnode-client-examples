@@ -1,5 +1,5 @@
-require("@nomiclabs/hardhat-waffle");
+require('@nomiclabs/hardhat-waffle');
 
 module.exports = {
-  solidity: "0.6.12",
+  solidity: '0.6.12',
 };

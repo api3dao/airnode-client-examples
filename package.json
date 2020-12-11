@@ -2,7 +2,10 @@
   "name": "airnode-client-examples",
   "description": "Airnode client contract examples",
   "scripts": {
-    "example1": "hardhat run scripts/example1.js"
+    "example1": "hardhat run scripts/example1.js",
+    "lint": "eslint . --ext .js,.ts",
+    "prettify": "prettier --write ./**/*.{js,ts}",
+    "pretty-quick": "pretty-quick --staged --pattern \"**/*.*(js|ts)\""
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
@@ -11,8 +14,17 @@
     "airnode-abi": "^0.1.0",
     "airnode-protocol": "^0.1.1",
     "chai": "^4.2.0",
+    "eslint": "^7.15.0",
     "ethereum-waffle": "^3.2.1",
     "ethers": "^5.0.24",
-    "hardhat": "^2.0.5"
+    "hardhat": "^2.0.5",
+    "husky": "^4.3.5",
+    "prettier": "^2.2.1",
+    "pretty-quick": "^3.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run pretty-quick && yarn run lint"
+    }
   }
 }
