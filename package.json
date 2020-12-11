@@ -1,0 +1,18 @@
+{
+  "name": "airnode-client-examples",
+  "description": "Airnode client contract examples",
+  "scripts": {
+    "example1": "hardhat run scripts/example1.js"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^3.3.0",
+    "airnode-abi": "^0.1.0",
+    "airnode-protocol": "^0.1.1",
+    "chai": "^4.2.0",
+    "ethereum-waffle": "^3.2.1",
+    "ethers": "^5.0.24",
+    "hardhat": "^2.0.5"
+  }
+}
