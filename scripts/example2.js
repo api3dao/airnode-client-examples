@@ -17,20 +17,6 @@ async function main() {
   // The provider has deployed an Airnode, which created a provider record:
   const { providerId, providerMnemonic } = await util.createProvider(airnode, providerAdminSigner);
 
-  // Let us assume someone has created a template using airnode-admin
-  // https://github.com/api3dao/airnode-admin#create-template
-  const templateId = await util.createTemplate(
-    airnode,
-    providerId,
-    '0x2605589dfc93c8f9c35eecdfe1e666c2193df30a8b13e1e0dd72941f59f9064c', // Example endpointId (randomly generated)
-    '123', // Someone else's requesterIndex
-    '0x67bc6ed2f24b978a429bd7836790ce70e63be644', // Someone else's designatedWallet
-    '0x398aabad0ae5c17cba05a837cf5de9313e973014', // Someone else's fulfillAddress
-    '0x52c2ebc9', // Someone else's fulfillFunctionId
-    airnodeAbi.encode([{ name: 'name1', type: 'bytes32', value: 'value1' }]) // Example template parameters
-  );
-  // ...and then shared the templateId with the requester.
-
   // ~~~~~We have set the stage, the example begins here~~~~~
 
   // The first thing that the requester needs to do is to create a record,
@@ -44,25 +30,30 @@ async function main() {
   });
 
   // Then, the requester deploys a client contract that will use the template to make requests
-  const ExampleClient1 = await hre.ethers.getContractFactory('ExampleClient1');
-  const exampleClient1 = await ExampleClient1.deploy(airnode.address);
+  const ExampleClient2 = await hre.ethers.getContractFactory('ExampleClient2');
+  const exampleClient2 = await ExampleClient2.deploy(airnode.address);
   // ...and endorses it. This is normally done using airnode-admin
   // https://github.com/api3dao/airnode-admin#endorse-client
   await airnode
     .connect(requesterAdminSigner)
-    .updateClientEndorsementStatus(requesterIndex, exampleClient1.address, true);
+    .updateClientEndorsementStatus(requesterIndex, exampleClient2.address, true);
 
-  // The template is created with someone else's requesterInd and designatedWallet.
-  // The client contract overrides these with the requester's values, but these values
-  // need to be provided to the contract first.
-  await exampleClient1.updateRequester(requesterIndex, designatedWalletAddress);
-
-  // The template also has someone else's fulfillAddress and fulfillFunctionId. However,
-  // the client already overrides these with its own address and the signature of its fulfill() function.
+  // The requester creates a template using airnode-admin
+  // https://github.com/api3dao/airnode-admin#create-template
+  const templateId = await util.createTemplate(
+    airnode,
+    providerId,
+    '0x2605589dfc93c8f9c35eecdfe1e666c2193df30a8b13e1e0dd72941f59f9064c', // Example endpointId (randomly generated)
+    requesterIndex, // Requester index that was just assigned
+    designatedWalletAddress, // Designated wallet that was just derived
+    exampleClient2.address, // Address of the client that was just deployed
+    exampleClient2.interface.getSighash('fulfill(bytes32,uint256,bytes32)'), // Signature of the function that will be called back
+    airnodeAbi.encode([{ name: 'name1', type: 'bytes32', value: 'value1' }]) // Example template parameters
+  );
 
   // Now we can trigger a request. Note that in addition to the templateId, the request
   // can include additional parameters encoded in Airnode ABI.
-  const response = await exampleClient1.makeRequest(
+  const response = await exampleClient2.makeRequest(
     templateId,
     airnodeAbi.encode([{ name: 'name2', type: 'bytes32', value: 'value2' }])
   );
@@ -73,9 +64,9 @@ async function main() {
   // the response to fulfill it.
 
   // For the sake of completeness, let us mock the provider Airnode fulfilling the request,
-  await util.fulfillRegularRequest(airnode, requestId, providerMnemonic);
+  await util.fulfillShortRequest(airnode, requestId, providerMnemonic);
   // ...and print the returned data.
-  const fulfilledData = await exampleClient1.fulfilledData(requestId);
+  const fulfilledData = await exampleClient2.fulfilledData(requestId);
   console.log(hre.ethers.utils.parseBytes32String(fulfilledData));
 }
 

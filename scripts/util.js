@@ -1,5 +1,4 @@
 const hre = require('hardhat');
-const airnodeAbi = require('airnode-abi');
 
 async function createProvider(airnode, providerAdminSigner) {
   // No need to understand what exactly is happening here.
@@ -22,17 +21,24 @@ async function createProvider(airnode, providerAdminSigner) {
   };
 }
 
-async function createTemplate(airnode, providerId) {
-  // This is normally done using airnode-admin
-  // https://github.com/api3dao/airnode-admin#create-template
+async function createTemplate(
+  airnode,
+  providerId,
+  endpointId,
+  requesterInd,
+  designatedWallet,
+  fulfillAddress,
+  fulfillFunctionId,
+  parameters
+) {
   const response = await airnode.createTemplate(
     providerId,
-    '0x2605589dfc93c8f9c35eecdfe1e666c2193df30a8b13e1e0dd72941f59f9064c', // endpointId
-    '123', // requesterInd
-    '0x67bc6ed2f24b978a429bd7836790ce70e63be644', // designatedWallet
-    '0x398aabad0ae5c17cba05a837cf5de9313e973014', // fulfillAddress
-    '0x52c2ebc9', // fulfillFunctionId
-    airnodeAbi.encode([{ name: 'name1', type: 'bytes32', value: 'value1' }])
+    endpointId,
+    requesterInd,
+    designatedWallet,
+    fulfillAddress,
+    fulfillFunctionId,
+    parameters
   );
   const receipt = await hre.waffle.provider.getTransactionReceipt(response.hash);
   const parsedLog = airnode.interface.parseLog(receipt.logs[0]);
@@ -89,10 +95,42 @@ async function fulfillRegularRequest(airnode, requestId, providerMnemonic) {
     );
 }
 
+async function fulfillShortRequest(airnode, requestId, providerMnemonic) {
+  // No need to understand what exactly is happening here.
+  // Airnode does this automatically when it detects a request.
+  const logs = await airnode.provider.getLogs({
+    address: airnode.address,
+    fromBlock: 0,
+    topics: [
+      hre.ethers.utils.id('ClientShortRequestCreated(bytes32,bytes32,uint256,address,bytes32,bytes)'),
+      null,
+      requestId,
+    ],
+  });
+  const parsedLog = airnode.interface.parseLog(logs[0]);
+  const template = await airnode.getTemplate(parsedLog.args.templateId);
+
+  const masterHdNode = hre.ethers.utils.HDNode.fromMnemonic(providerMnemonic);
+  const designatedHdNode = masterHdNode.derivePath(`m/0/${template.requesterInd}`);
+  const designatedWallet = new hre.ethers.Wallet(designatedHdNode.privateKey, hre.waffle.provider);
+
+  await airnode
+    .connect(designatedWallet)
+    .fulfill(
+      requestId,
+      template.providerId,
+      0,
+      hre.ethers.utils.formatBytes32String('API response'),
+      template.fulfillAddress,
+      template.fulfillFunctionId
+    );
+}
+
 module.exports = {
   createProvider,
   createTemplate,
   createRequester,
   deriveDesignatedWalletAddress,
   fulfillRegularRequest,
+  fulfillShortRequest,
 };

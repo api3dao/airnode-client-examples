@@ -3,6 +3,7 @@
   "description": "Airnode client contract examples",
   "scripts": {
     "example1": "hardhat run scripts/example1.js",
+    "example2": "hardhat run scripts/example2.js",
     "lint": "eslint . --ext .js,.ts",
     "prettify": "prettier --write ./**/*.{js,ts}",
     "pretty-quick": "pretty-quick --staged --pattern \"**/*.*(js|ts)\""
