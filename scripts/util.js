@@ -126,6 +126,38 @@ async function fulfillShortRequest(airnode, requestId, providerMnemonic) {
     );
 }
 
+async function fulfillFullRequest(airnode, requestId, providerMnemonic) {
+  // No need to understand what exactly is happening here.
+  // Airnode does this automatically when it detects a request.
+  const logs = await airnode.provider.getLogs({
+    address: airnode.address,
+    fromBlock: 0,
+    topics: [
+      hre.ethers.utils.id(
+        'ClientFullRequestCreated(bytes32,bytes32,uint256,address,bytes32,uint256,address,address,bytes4,bytes)'
+      ),
+      null,
+      requestId,
+    ],
+  });
+  const parsedLog = airnode.interface.parseLog(logs[0]);
+
+  const masterHdNode = hre.ethers.utils.HDNode.fromMnemonic(providerMnemonic);
+  const designatedHdNode = masterHdNode.derivePath(`m/0/${parsedLog.args.requesterInd}`);
+  const designatedWallet = new hre.ethers.Wallet(designatedHdNode.privateKey, hre.waffle.provider);
+
+  await airnode
+    .connect(designatedWallet)
+    .fulfill(
+      requestId,
+      parsedLog.args.providerId,
+      0,
+      hre.ethers.utils.formatBytes32String('API response'),
+      parsedLog.args.fulfillAddress,
+      parsedLog.args.fulfillFunctionId
+    );
+}
+
 module.exports = {
   createProvider,
   createTemplate,
@@ -133,4 +165,5 @@ module.exports = {
   deriveDesignatedWalletAddress,
   fulfillRegularRequest,
   fulfillShortRequest,
+  fulfillFullRequest,
 };

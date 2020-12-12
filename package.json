@@ -2,8 +2,10 @@
   "name": "airnode-client-examples",
   "description": "Airnode client contract examples",
   "scripts": {
+    "build": "hardhat compile",
     "example1": "hardhat run scripts/example1.js",
     "example2": "hardhat run scripts/example2.js",
+    "example3": "hardhat run scripts/example3.js",
     "lint": "eslint . --ext .js,.ts",
     "prettify": "prettier --write ./**/*.{js,ts}",
     "pretty-quick": "pretty-quick --staged --pattern \"**/*.*(js|ts)\""

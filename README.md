@@ -18,3 +18,8 @@ This example uses a [regular request](https://github.com/api3dao/api3-docs/blob/
 
 This example uses a [short request](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/request.md#2-short-request), meaning that it refers to a [template](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/template.md) for all parameters.
 Differently from Example 1, the requester deploys the client contract first, then uses its address while creating the template
+
+## Example 3
+
+This example uses a [full request](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/request.md#3-full-request), meaning that all parameters are passed at request-time.
+As a result, no template is used.
