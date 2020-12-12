@@ -17,7 +17,7 @@ async function main() {
   // The provider has deployed an Airnode, which created a provider record:
   const { providerId, providerMnemonic } = await util.createProvider(airnode, providerAdminSigner);
 
-  // Let us assume someone has created a template using
+  // Let us assume someone has created a template using airnode-admin
   // https://github.com/api3dao/airnode-admin#create-template
   const templateId = await util.createTemplate(airnode, providerId);
   // ...and then shared the templateId with the requester.
@@ -26,19 +26,19 @@ async function main() {
 
   // The first thing that the requester needs to do is to create a record,
   const requesterIndex = await util.createRequester(airnode, requesterAdminSigner);
-  // derive their designated wallet associated with the provider,
+  // ...derive their designated wallet associated with the provider,
   const designatedWalletAddress = await util.deriveDesignatedWalletAddress(airnode, providerId, requesterIndex);
-  // and fund it.
+  // ...and fund it.
   await requesterAdminSigner.sendTransaction({
     to: designatedWalletAddress,
     value: hre.ethers.utils.parseEther('0.1'),
   });
 
-  // Then, the requester deploys a client contract that will use this template to make requests
+  // Then, the requester deploys a client contract that will use the template to make requests
   const ExampleClient1 = await hre.ethers.getContractFactory('ExampleClient1');
   const exampleClient1 = await ExampleClient1.deploy(airnode.address);
-  // and endorse it. This is normally done using airnode-admin
-  // https://github.com/api3dao/airnode-admin#endorse-client)
+  // ...and endorses it. This is normally done using airnode-admin
+  // https://github.com/api3dao/airnode-admin#endorse-client
   await airnode
     .connect(requesterAdminSigner)
     .updateClientEndorsementStatus(requesterIndex, exampleClient1.address, true);
@@ -63,9 +63,9 @@ async function main() {
   // And we are done! Provider's Airnode will detect the request, and call fulfill() with
   // the response to fulfill it.
 
-  // For the sake of completeness, let us mock the provider Airnode fulfill the request,
+  // For the sake of completeness, let us mock the provider Airnode fulfilling the request,
   await util.fulfillRegularRequest(airnode, requestId, providerMnemonic);
-  // and print the returned data.
+  // ...and print the returned data.
   const fulfilledData = await exampleClient1.fulfilledData(requestId);
   console.log(hre.ethers.utils.parseBytes32String(fulfilledData));
 }

@@ -26,7 +26,7 @@ async function createTemplate(airnode, providerId) {
   // This is normally done using airnode-admin
   // https://github.com/api3dao/airnode-admin#create-template
   const response = await airnode.createTemplate(
-    providerId, // providerId
+    providerId,
     '0x2605589dfc93c8f9c35eecdfe1e666c2193df30a8b13e1e0dd72941f59f9064c', // endpointId
     '123', // requesterInd
     '0x67bc6ed2f24b978a429bd7836790ce70e63be644', // designatedWallet
@@ -59,7 +59,7 @@ async function deriveDesignatedWalletAddress(airnode, providerId, requesterIndex
 
 async function fulfillRegularRequest(airnode, requestId, providerMnemonic) {
   // No need to understand what exactly is happening here.
-  // Airnode does this automatically.
+  // Airnode does this automatically when it detects a request.
   const logs = await airnode.provider.getLogs({
     address: airnode.address,
     fromBlock: 0,
