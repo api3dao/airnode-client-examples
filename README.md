@@ -13,3 +13,8 @@ You are recommended to read the [protocol docs](https://github.com/api3dao/api3-
 ## Example 1
 
 This example uses a [regular request](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/request.md#1-regular-request), meaning that it refers to a [template](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/template.md), but also allows the [requester](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/requester.md) to provide their own `requesterInd`, `designatedWallet`, `fulfillAddress` and `fulfillFunctionId`.
+
+## Example 2
+
+This example uses a [short request](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/request.md#2-short-request), meaning that it refers to a [template](https://github.com/api3dao/api3-docs/blob/master/request-response-protocol/template.md) for all parameters.
+Differently from Example 1, the requester deploys the client contract first, then uses its address while creating the template
