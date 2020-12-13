@@ -3,7 +3,7 @@ const hre = require('hardhat');
 async function createProvider(airnode, providerAdminSigner) {
   // No need to understand what exactly is happening here.
   // Airnode does this automatically after being deployed.
-  // https://github.com/api3dao/api3-docs/blob/master/guides/deploying-airnode.md#deployment
+  // https://github.com/api3dao/api3-docs/blob/master/provider-guides/deploying-airnode.md#deployment
   const providerMnemonic = hre.ethers.Wallet.createRandom().mnemonic.phrase;
   const hdNode = hre.ethers.utils.HDNode.fromMnemonic(providerMnemonic);
   const xpub = hdNode.neuter().extendedKey;
